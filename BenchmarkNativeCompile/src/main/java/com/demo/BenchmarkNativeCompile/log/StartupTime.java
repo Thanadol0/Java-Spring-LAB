@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class StartupTime implements ApplicationListener<ApplicationReadyEvent> {
 
     private static long startNano = System.nanoTime();
+
     private static long startupNano = -1;
 
     @Override
