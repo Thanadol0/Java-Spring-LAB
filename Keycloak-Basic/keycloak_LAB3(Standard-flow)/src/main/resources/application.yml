@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   security:
     oauth2:
@@ -13,3 +16,6 @@ spring:
           keycloak:
             issuer-uri: http://localhost:8080/realms/BankRealm
             user-name-attribute: preferred_username
+logging:
+  level:
+    org.springframework.security: DEBUG
