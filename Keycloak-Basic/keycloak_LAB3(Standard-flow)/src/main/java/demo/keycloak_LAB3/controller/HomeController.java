@@ -27,4 +27,10 @@ public class HomeController {
     public String admin(@AuthenticationPrincipal OidcUser user) {
         return "Hello ADMIN: " + user.getPreferredUsername();
     }
+
+    @GetMapping("/error")
+    public String error() {
+        return "redirect:/home"; // กัน fallback error
+    }
+
 }

@@ -4,6 +4,10 @@
 <body>
 <h1>Welcome [[${name}]]!</h1>
 <p><a href="/admin">Go to Admin Page</a></p>
-<p><a href="/logout">Logout</a></p>
+
+<form th:action="@{/logout}" method="post">
+    <button type="submit">Logout</button>
+</form>
+
 </body>
 </html>
