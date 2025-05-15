@@ -1,1 +1,19 @@
-spring.application.name=keycloak-LAB4
+server:
+  port: 8081
+
+spring:
+  application:
+    name: keycloak-LAB4
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: lab4-api-client
+            client-secret: YPqdLe2pBFK7Y8GZWJleLpVYZ8O1R9kl
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            token-uri: http://localhost:8180/realms/LAB4-Service-accounts-roles/protocol/openid-connect/token
