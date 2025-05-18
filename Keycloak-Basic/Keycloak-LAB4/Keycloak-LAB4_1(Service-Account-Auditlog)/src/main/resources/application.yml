@@ -1,0 +1,29 @@
+server:
+  port: 8100
+
+spring:
+  application:
+    name: lab-4-1-service-account-auditLog
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/auditDB
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8111/realms/bank-realm
+
+logging:
+  level:
+    com.example.lab41: INFO

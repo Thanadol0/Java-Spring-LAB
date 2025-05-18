@@ -1,0 +1,35 @@
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: keycloak-lab4_1
+    command: start-dev
+    ports:
+      - "8111:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    networks:
+      - lab401-net
+
+  postgres:
+    image: postgres:15
+    container_name: lab401-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auditDB
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - lab401-net
+
+volumes:
+  pgdata:
+
+networks:
+  lab401-net:
+    driver: bridge
