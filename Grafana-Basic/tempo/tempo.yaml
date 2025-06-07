@@ -1,0 +1,29 @@
+server:
+  http_listen_port: 3200        # พอร์ต query UI
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:                   # รับ trace gRPC 4317 ภายใน network
+        http:                   # รับ trace HTTP 4318 ภายใน network
+
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /var/tempo/traces    # ถูก bind ด้วย volume tempo-data
+
+compactor:
+  compaction:
+    block_retention: 24h         # <-- ตั้ง retention ที่นี่ (ไม่ใช่ top-level)
+
+overrides:
+  metrics_generator_processors: [service-graphs, span-metrics]  # ปิดได้ถ้าไม่ใช้

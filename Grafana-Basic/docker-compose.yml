@@ -1,0 +1,98 @@
+version: "3.9"
+
+networks:
+  observability:
+    driver: bridge
+
+volumes:
+  prometheus-data: {}
+  grafana-data: {}
+  loki-data: {}
+  tempo-data: {}
+
+services:
+  grafana:
+    image: grafana/grafana:12.0.1-ubuntu
+    container_name: grafana
+    networks: [observability]
+    ports: ["3000:3000"]
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    depends_on: [prometheus, loki, tempo]
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    networks: [observability]
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:3.5.1
+    container_name: loki
+    networks: [observability]
+    volumes:
+      - loki-data:/loki
+      - ./loki/loki.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:3.5.1
+    container_name: promtail
+    networks: [observability]
+    volumes:
+      - /var/log:/var/log          # host log
+      - /etc/machine-id:/etc/machine-id
+      - ./promtail/promtail.yaml:/etc/promtail/promtail.yaml
+    command: -config.file=/etc/promtail/promtail.yaml
+    depends_on: [loki]
+    restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:2.7.1
+    container_name: tempo
+    networks: [observability]
+    volumes:
+      - tempo-data:/var/tempo
+      - ./tempo/tempo.yaml:/etc/tempo.yaml
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    ports:
+      - "3200:3200"   # Tempo query
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.106.1
+    container_name: otel-collector
+    networks: [observability]
+    volumes:
+      - ./otel/config.yaml:/etc/otelcol-contrib/config.yaml
+    command: [ "--config=/etc/otelcol-contrib/config.yaml" ]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on: [tempo, prometheus]
+    restart: unless-stopped
+
+  banking-service-test:
+    build:
+      context: ./services/banking-service-test
+    image: banking-service-test:latest
+    container_name: banking-service-test
+    networks: [observability]
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: "true"
+      SPRING_PROFILES_ACTIVE: docker
+    ports: ["8080:8080"]
+    depends_on: [otel-collector]
+    restart: unless-stopped

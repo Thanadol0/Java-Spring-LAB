@@ -1,0 +1,32 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096       # ค่า default
+
+common:
+  replication_factor: 1        # single node
+  ring:
+    kvstore:
+      store: inmemory
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/index
+    cache_location: /loki/index_cache
+    shared_store: filesystem       # ✅ ต้องอยู่ตรงนี้ (ไม่ใช่ใน index)
+  filesystem:
+    directory: /loki/chunks        # เก็บ chunk จริง
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: loki_index_
+        period: 24h
+
+limits_config:
+  retention_period: 24h
