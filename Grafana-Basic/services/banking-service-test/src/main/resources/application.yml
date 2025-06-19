@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: banking-service-test
+management:
+  endpoints.web.exposure.include: health,info,prometheus
+  tracing:
+    sampling.probability: 1.0    # ???? sample 100% (lab)
+micrometer:
+  tracing:
+    enabled: true
+
+otel:
+  exporter:
+    otlp:
+      endpoint: http://otel-collector:4317
+      compression: gzip
+      protocol: grpc

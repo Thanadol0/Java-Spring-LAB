@@ -9,6 +9,7 @@ volumes:
   grafana-data: {}
   loki-data: {}
   tempo-data: {}
+  loki-runtime: {}
 
 services:
   grafana:
@@ -39,11 +40,11 @@ services:
   loki:
     image: grafana/loki:3.5.1
     container_name: loki
-    networks: [observability]
+    networks: [ observability ]
     volumes:
-      - loki-data:/loki
-      - ./loki/loki.yaml:/etc/loki/local-config.yaml
-    command: -config.file=/etc/loki/local-config.yaml
+      - ./loki/loki.yaml:/etc/loki/loki-custom.yaml:ro
+      - loki-runtime:/loki
+    command: [ "-config.file=/etc/loki/loki-custom.yaml" ]
     restart: unless-stopped
 
   promtail:
