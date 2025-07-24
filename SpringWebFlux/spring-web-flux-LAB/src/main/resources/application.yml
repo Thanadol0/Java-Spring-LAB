@@ -1,0 +1,27 @@
+spring:
+  port: 8080
+  application:
+    name: spring-web-flux-LAB
+
+  # ---------- R2DBC (Reactive path) ----------
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5433/student_web_flux_lab
+    username: root
+    password: test
+
+    pool:
+      enabled: true
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 30m
+      validation-query: SELECT 1
+
+  # ---------- Flyway (JDBC path) ----------
+  flyway:
+    url: jdbc:postgresql://localhost:5433/student_web_flux_lab
+    user: root
+    password: test
+    enabled: true
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    locations: classpath:db/migration

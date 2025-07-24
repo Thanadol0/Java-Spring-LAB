@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  postgres-db:
+    image: postgres:16
+    container_name: student-r2dbc-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: student_web_flux_lab
+    ports:
+      - "5433:5432"
